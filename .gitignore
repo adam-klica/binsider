@@ -1,0 +1,8 @@
+.local-credentials
+dist/
+.DS_Store
+node_modules/
+.local-db.env
+# Kept local only (public repo): server address, internal plan/notes
+.deploy.env
+Plan.md

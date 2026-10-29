@@ -1,0 +1,57 @@
+name: binsider
+
+services:
+  db:
+    image: mariadb:11
+    restart: unless-stopped
+    # Credentials: .local-db.env (generated, gitignored).
+    env_file: .local-db.env
+    volumes:
+      - db:/var/lib/mysql
+    healthcheck:
+      test: ["CMD", "healthcheck.sh", "--connect", "--innodb_initialized"]
+      interval: 5s
+      retries: 20
+
+  wordpress:
+    image: wordpress:php8.3-apache
+    restart: unless-stopped
+    depends_on:
+      db:
+        condition: service_healthy
+    ports:
+      - "127.0.0.1:8080:80"   # this Mac only, not the local network
+    env_file: .local-db.env
+    environment:
+      WORDPRESS_DEBUG: "1"
+      WORDPRESS_CONFIG_EXTRA: |
+        define('WP_DEBUG_LOG', true);
+        define('WP_DEBUG_DISPLAY', false);
+        define('WP_ENVIRONMENT_TYPE', 'local');
+    volumes:
+      - wp:/var/www/html
+      - ./theme/binsider:/var/www/html/wp-content/themes/binsider
+      - ./plugin/binsider-core:/var/www/html/wp-content/plugins/binsider-core
+      - ./plugin/binsider-starter:/var/www/html/wp-content/plugins/binsider-starter
+
+  cli:
+    image: wordpress:cli-php8.3
+    user: "33:33"
+    depends_on:
+      - wordpress
+    env_file: .local-db.env
+    environment:
+      HOME: /tmp
+    volumes:
+      - wp:/var/www/html
+      - ./theme/binsider:/var/www/html/wp-content/themes/binsider
+      - ./plugin/binsider-core:/var/www/html/wp-content/plugins/binsider-core
+      - ./plugin/binsider-starter:/var/www/html/wp-content/plugins/binsider-starter
+      - ./scripts:/scripts:ro
+      - ./demo:/demo:ro
+    entrypoint: ["wp"]
+    profiles: ["cli"]
+
+volumes:
+  db:
+  wp:

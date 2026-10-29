@@ -1,0 +1,43 @@
+<!-- wp:template-part {"slug":"header","area":"header","tagName":"header"} /-->
+<!-- wp:group {"tagName":"main","className":"bi-main","layout":{"type":"default"}} -->
+<main class="wp-block-group bi-main">
+<!-- wp:group {"className":"bi-wrap bi-archive-head","layout":{"type":"default"}} -->
+<div class="wp-block-group bi-wrap bi-archive-head">
+<!-- wp:query-title {"type":"archive","showPrefix":false,"className":"bi-archive-head__title"} /-->
+<!-- wp:term-description {"className":"bi-archive-head__desc"} /-->
+</div>
+<!-- /wp:group -->
+<!-- wp:group {"className":"bi-wrap bi-archive","layout":{"type":"default"}} -->
+<div class="wp-block-group bi-wrap bi-archive"><!-- wp:query {"queryId":18,"query":{"perPage":12,"pages":0,"offset":0,"postType":"post","order":"desc","orderBy":"date","author":"","search":"","exclude":[],"sticky":"","inherit":true},"className":"bi-q bi-q--archive"} -->
+<div class="wp-block-query bi-q bi-q--archive">
+<!-- wp:post-template {"className":"bi-cards"} -->
+<!-- wp:group {"tagName":"article","className":"bi-card","layout":{"type":"default"}} -->
+<article class="wp-block-group bi-card">
+<!-- wp:post-featured-image {"isLink":true,"aspectRatio":"3/2","sizeSlug":"large","className":"bi-card__img"} /-->
+<!-- wp:group {"className":"bi-card__body","layout":{"type":"default"}} -->
+<div class="wp-block-group bi-card__body">
+<!-- wp:binsider/post-label /-->
+<!-- wp:post-title {"isLink":true,"level":3,"className":"bi-card__title"} /-->
+<!-- wp:post-excerpt {"excerptLength":30,"className":"bi-card__excerpt"} /-->
+<!-- wp:binsider/post-byline /-->
+</div>
+<!-- /wp:group -->
+</article>
+<!-- /wp:group -->
+<!-- /wp:post-template -->
+<!-- wp:query-pagination {"paginationArrow":"arrow","className":"bi-pagination","layout":{"type":"flex","justifyContent":"space-between"}} -->
+<!-- wp:query-pagination-previous {"label":"Novije"} /-->
+<!-- wp:query-pagination-numbers /-->
+<!-- wp:query-pagination-next {"label":"Starije"} /-->
+<!-- /wp:query-pagination -->
+<!-- wp:query-no-results -->
+<!-- wp:paragraph {"className":"bi-empty"} -->
+<p class="bi-empty">Nema članaka za prikaz.</p>
+<!-- /wp:paragraph -->
+<!-- /wp:query-no-results -->
+</div>
+<!-- /wp:query --></div>
+<!-- /wp:group -->
+</main>
+<!-- /wp:group -->
+<!-- wp:template-part {"slug":"footer","area":"footer","tagName":"footer"} /-->

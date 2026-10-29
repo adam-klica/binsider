@@ -1,0 +1,45 @@
+<!-- wp:template-part {"slug":"header","area":"header","tagName":"header"} /-->
+<!-- wp:group {"tagName":"main","className":"bi-main","layout":{"type":"default"}} -->
+<main class="wp-block-group bi-main">
+<!-- wp:group {"className":"bi-wrap bi-404","layout":{"type":"default"}} -->
+<div class="wp-block-group bi-wrap bi-404">
+<!-- wp:paragraph {"className":"bi-404__code"} -->
+<p class="bi-404__code">404</p>
+<!-- /wp:paragraph -->
+<!-- wp:heading {"level":1,"className":"bi-404__title"} -->
+<h1 class="wp-block-heading bi-404__title">Stranica nije pronađena</h1>
+<!-- /wp:heading -->
+<!-- wp:paragraph -->
+<p>Link je možda zastario ili je članak premješten. Pokušajte pretragu ili pogledajte najnovije vijesti.</p>
+<!-- /wp:paragraph -->
+<!-- wp:search {"label":"Pretraga","showLabel":false,"placeholder":"Pretraži vijesti…","buttonText":"Traži","className":"bi-search bi-search--big"} /-->
+</div>
+<!-- /wp:group -->
+<!-- wp:group {"tagName":"section","className":"bi-wrap bi-section","layout":{"type":"default"}} -->
+<section class="wp-block-group bi-wrap bi-section">
+<!-- wp:group {"className":"bi-section-title","layout":{"type":"default"}} -->
+<div class="wp-block-group bi-section-title"><!-- wp:heading {"className":"bi-section-title__h"} -->
+<h2 class="wp-block-heading bi-section-title__h">Najnovije</h2>
+<!-- /wp:heading --></div>
+<!-- /wp:group -->
+<!-- wp:query {"queryId":22,"query":{"perPage":4,"pages":0,"offset":0,"postType":"post","order":"desc","orderBy":"date","author":"","search":"","exclude":[],"sticky":"","inherit":false},"className":"bi-q bi-q--row"} -->
+<div class="wp-block-query bi-q bi-q--row"><!-- wp:post-template {"className":"bi-cards"} -->
+<!-- wp:group {"tagName":"article","className":"bi-card","layout":{"type":"default"}} -->
+<article class="wp-block-group bi-card">
+<!-- wp:post-featured-image {"isLink":true,"aspectRatio":"3/2","sizeSlug":"medium_large","className":"bi-card__img"} /-->
+<!-- wp:group {"className":"bi-card__body","layout":{"type":"default"}} -->
+<div class="wp-block-group bi-card__body">
+<!-- wp:binsider/post-label /-->
+<!-- wp:post-title {"isLink":true,"level":3,"className":"bi-card__title"} /-->
+<!-- wp:binsider/post-byline /-->
+</div>
+<!-- /wp:group -->
+</article>
+<!-- /wp:group -->
+<!-- /wp:post-template --></div>
+<!-- /wp:query -->
+</section>
+<!-- /wp:group -->
+</main>
+<!-- /wp:group -->
+<!-- wp:template-part {"slug":"footer","area":"footer","tagName":"footer"} /-->
