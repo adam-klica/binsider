@@ -15,6 +15,19 @@
 		body.appendChild( progress );
 	}
 
+	// Phones: the masthead search field is folded behind a magnifier button.
+	var toggle = document.querySelector( '.bi-search-toggle' );
+	if ( toggle && masthead ) {
+		toggle.addEventListener( 'click', function () {
+			var open = masthead.classList.toggle( 'is-search-open' );
+			toggle.setAttribute( 'aria-expanded', open ? 'true' : 'false' );
+			var input = masthead.querySelector( '.bi-search input[type="search"]' );
+			if ( open && input ) {
+				input.focus();
+			}
+		} );
+	}
+
 	var ticking = false;
 	function update() {
 		ticking = false;

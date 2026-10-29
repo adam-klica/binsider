@@ -38,12 +38,13 @@ function query(q, cls, inner) {
 }
 
 // One card markup everywhere; CSS decides what each list variant shows.
-function card({ level = 3, excerpt = false, image = 'large' } = {}) {
+// `sizes` names a class that binsider-core maps to the image's `sizes` attribute (includes/performance.php).
+function card({ level = 3, excerpt = false, image = 'large', sizes = 'col' } = {}) {
   return group(
     'bi-card',
     j(
       '',
-      self('post-featured-image', { isLink: true, aspectRatio: '3/2', sizeSlug: image, className: 'bi-card__img' }),
+      self('post-featured-image', { isLink: true, aspectRatio: '3/2', sizeSlug: image, className: `bi-card__img bi-sz-${sizes}` }),
       group(
         'bi-card__body',
         j(
@@ -76,6 +77,12 @@ const page = (main) => j(part('header', 'header'), group('bi-main', main, 'main'
 // ---------- parts ----------
 const searchBlock = (cls = 'bi-search') => self('search', { label: 'Pretraga', showLabel: false, placeholder: 'Pretraži vijesti…', buttonText: 'Traži', className: cls });
 
+// Phones only (CSS): a magnifier that unfolds the search field (theme.js) and the tip link from the hidden top bar.
+const mastActions =
+  `<!-- wp:html -->\n<div class="bi-mast-actions"><button class="bi-search-toggle" type="button" aria-expanded="false" aria-label="Pretraga">` +
+  `<svg class="bi-icon" width="20" height="20" viewBox="0 0 24 24" aria-hidden="true"><circle cx="10.5" cy="10.5" r="6.5" fill="none" stroke="currentColor" stroke-width="2.4"/><path d="M15.5 15.5 21 21" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"/></svg>` +
+  `</button><a class="bi-mast-tip" href="/posalji-vijest/">Pošalji vijest</a></div>\n<!-- /wp:html -->`;
+
 // Header: kilim band, top bar, masthead, sticky section bar (with a mini mark), ticker.
 // The header wrappers are display:contents in CSS so the section bar can stick to the viewport.
 const header = group(
@@ -84,7 +91,7 @@ const header = group(
     '',
     group('bi-kilim', ''),
     group('bi-topbar', group('bi-wrap bi-topbar__in', j('', self('binsider/date'), group('bi-topbar__right', j('', self('binsider/social'), para('<a href="/posalji-vijest/">Pošalji vijest</a>', 'bi-topbar__cta'), '')), ''))),
-    group('bi-masthead', group('bi-wrap bi-masthead__in', j('', self('binsider/logo', { variant: 'horizontal' }), para('Nezavisni portal Bošnjaka Crne Gore, regiona i dijaspore', 'bi-masthead__tag'), searchBlock(), ''))),
+    group('bi-masthead', group('bi-wrap bi-masthead__in', j('', self('binsider/logo', { variant: 'horizontal' }), para('Nezavisni portal Bošnjaka Crne Gore, regiona i dijaspore', 'bi-masthead__tag'), mastActions, searchBlock(), ''))),
     group('bi-navbar', group('bi-wrap bi-navbar__in', j('', self('binsider/logo', { variant: 'mark' }), self('binsider/sections-nav'), ''))),
     self('binsider/ticker'),
     '',
@@ -147,8 +154,8 @@ const front = page(
       'bi-wrap bi-top',
       j(
         '',
-        query({ perPage: 1, binsider: 'lead' }, 'bi-q--lead', template(card({ level: 2, excerpt: true, image: 'full' }))),
-        query({ perPage: 4, binsider: 'secondary' }, 'bi-q--side', template(card({ image: 'medium_large' }))),
+        query({ perPage: 1, binsider: 'lead' }, 'bi-q--lead', template(card({ level: 2, excerpt: true, image: 'full', sizes: 'lead' }))),
+        query({ perPage: 4, binsider: 'secondary' }, 'bi-q--side', template(card({ image: 'medium', sizes: 'thumb' }))),
         '',
       ),
       'section',
@@ -158,7 +165,7 @@ const front = page(
       'bi-wrap bi-split bi-reveal',
       j(
         '',
-        group('bi-split__main', j('', plainTitle('Najnovije'), query({ perPage: 8, offset: 4, binsider: 'secondary' }, 'bi-q--list', template(card({ image: 'medium_large', excerpt: true }))), para('<a href="/najnovije/">Sve najnovije vijesti</a>', 'bi-more'), '')),
+        group('bi-split__main', j('', plainTitle('Najnovije'), query({ perPage: 8, offset: 4, binsider: 'secondary' }, 'bi-q--list', template(card({ image: 'medium_large', excerpt: true, sizes: 'list' }))), para('<a href="/najnovije/">Sve najnovije vijesti</a>', 'bi-more'), '')),
         group('bi-split__side', j('', self('binsider/most-read', { count: 5 }), tipBox, group('bi-follow', j('', heading('Pratite nas', 2, 'bi-follow__h'), para('Video prilozi, intervjui i foto galerije svakog dana na našim mrežama.', ''), self('binsider/social'), '')), '')),
         '',
       ),
@@ -166,7 +173,7 @@ const front = page(
     ),
     // 3. Regions
     ...regions.map(([slug, cls, n, wrap]) => {
-      const inner = j('', sectionTitle(slug), query({ perPage: n, cat: slug }, cls, template(card({ excerpt: true }))), '');
+      const inner = j('', sectionTitle(slug), query({ perPage: n, cat: slug }, cls, template(card({ excerpt: true, sizes: cls.includes('feature') ? 'half' : 'col' }))), '');
       return wrap ? band(wrap, inner) : section('', inner);
     }),
     // 4. Video band
@@ -175,14 +182,14 @@ const front = page(
     group('bi-wrap bi-cols bi-reveal', j('', ...topics.map(([slug]) => group('bi-col', j('', sectionTitle(slug), query({ perPage: 4, cat: slug }, 'bi-q--col', template(card({ image: 'medium_large' }))), ''))), ''), 'section'),
     // 6. Sport + photo mosaic
     section('', j('', sectionTitle('sport-i-zanimljivosti'), query({ perPage: 4, cat: 'sport-i-zanimljivosti' }, 'bi-q--row', template(card({ image: 'medium_large' }))), '')),
-    section('', j('', sectionTitle('foto-i-dokumenti'), query({ perPage: 4, cat: 'foto-i-dokumenti' }, 'bi-q--mosaic', template(card({ image: 'large' }))), '')),
+    section('', j('', sectionTitle('foto-i-dokumenti'), query({ perPage: 4, cat: 'foto-i-dokumenti' }, 'bi-q--mosaic', template(card({ image: 'large', sizes: 'half' }))), '')),
     '',
   ),
 );
 
 // ---------- archive / search / index ----------
 const archiveList = (inherit = true) =>
-  query({ perPage: 12, inherit }, 'bi-q--archive', j('', template(card({ excerpt: true })), pagination(), noResults('Nema članaka za prikaz.'), ''));
+  query({ perPage: 12, inherit }, 'bi-q--archive', j('', template(card({ excerpt: true, sizes: 'half' })), pagination(), noResults('Nema članaka za prikaz.'), ''));
 
 const archive = page(
   j(

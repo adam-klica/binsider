@@ -76,6 +76,18 @@ add_filter(
 	2
 );
 
+// Yoast leaves the homepage without a meta description unless someone types one in its settings;
+// fall back to the site tagline (Settings → General) so the front page always has one.
+add_filter(
+	'wpseo_metadesc',
+	static function ( $desc ) {
+		if ( ( is_front_page() || is_home() ) && '' === trim( (string) $desc ) ) {
+			return get_bloginfo( 'description' );
+		}
+		return $desc;
+	}
+);
+
 // Yoast: articles are news articles.
 add_filter(
 	'wpseo_schema_article_type',

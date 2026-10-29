@@ -102,11 +102,20 @@ function binsider_block_post_id( WP_Block $block ): int {
 function binsider_render_logo( array $attrs ): string {
 	$variant = in_array( $attrs['variant'] ?? '', array( 'horizontal', 'stacked', 'mark' ), true ) ? $attrs['variant'] : 'horizontal';
 	$file    = 'mark' === $variant ? 'logo-mark.svg' : "logo-{$variant}" . ( 'light' === ( $attrs['color'] ?? '' ) ? '-white' : '' ) . '.svg';
-	$svg     = (string) file_get_contents( BINSIDER_DIR . 'assets/logo/' . $file ); // phpcs:ignore WordPress.WP.AlternativeFunctions
-	$svg     = preg_replace( '/<title>.*?<\/title>/', '', $svg );
-	$svg     = str_replace( '<svg ', '<svg aria-hidden="true" focusable="false" ', trim( $svg ) );
-	$link    = sprintf( '<a href="%s" rel="home"><span class="screen-reader-text">%s</span>%s</a>', esc_url( home_url( '/' ) ), esc_html( get_bloginfo( 'name' ) ), $svg );
-	$tag     = ( is_front_page() && ! is_paged() && 'mark' !== $variant ) ? 'h1' : 'div';
+	// An <img> instead of inline SVG: the logo is ~13 KB of outlined text, cached once instead of sent in every page.
+	$path = BINSIDER_DIR . 'assets/logo/' . $file;
+	$head = (string) file_get_contents( $path, false, null, 0, 300 ); // phpcs:ignore WordPress.WP.AlternativeFunctions
+	preg_match( '/viewBox="0 0 ([\d.]+) ([\d.]+)"/', $head, $m );
+	$img  = sprintf(
+		'<img src="%s" width="%d" height="%d" alt="%s" decoding="async"%s>',
+		esc_url( BINSIDER_URL . 'assets/logo/' . $file . '?v=' . filemtime( $path ) ),
+		(int) ( $m[1] ?? 100 ),
+		(int) ( $m[2] ?? 100 ),
+		esc_attr( get_bloginfo( 'name' ) ),
+		'mark' === $variant ? ' loading="lazy"' : ''
+	);
+	$link = sprintf( '<a href="%s" rel="home">%s</a>', esc_url( home_url( '/' ) ), $img );
+	$tag  = ( is_front_page() && ! is_paged() && 'mark' !== $variant ) ? 'h1' : 'div';
 	return binsider_wrapper( "bi-logo bi-logo--{$variant}", $link, $tag );
 }
 
@@ -243,6 +252,11 @@ function binsider_render_form( array $attrs ): string {
 	$id = binsider_form_id( (string) ( $attrs['form'] ?? 'kontakt' ) );
 	if ( ! $id ) {
 		return current_user_can( 'manage_options' ) ? binsider_wrapper( 'bi-notice', 'Forma nije dostupna — aktivirajte dodatak „Contact Form 7".', 'p' ) : '';
+	}
+	// CF7's scripts and styles are off site-wide (see seo.php); load them only where a form is rendered.
+	if ( function_exists( 'wpcf7_enqueue_scripts' ) ) {
+		wpcf7_enqueue_scripts();
+		wpcf7_enqueue_styles();
 	}
 	return binsider_wrapper( 'bi-form', do_shortcode( sprintf( '[contact-form-7 id="%d"]', $id ) ) );
 }
