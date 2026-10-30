@@ -18,6 +18,12 @@ add_filter(
 // Hide WordPress version.
 remove_action( 'wp_head', 'wp_generator' );
 
+// Head links nobody uses: RSD (points to the disabled XML-RPC), shortlinks, and the comments feed (comments are off).
+remove_action( 'wp_head', 'rsd_link' );
+remove_action( 'wp_head', 'wp_shortlink_wp_head' );
+remove_action( 'template_redirect', 'wp_shortlink_header', 11 );
+add_filter( 'feed_links_show_comments_feed', '__return_false' );
+
 // Block username discovery: /?author=N and the public users REST endpoint.
 add_action(
 	'template_redirect',

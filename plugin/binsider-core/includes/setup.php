@@ -84,6 +84,10 @@ function binsider_run_setup(): array {
 		$log[] = 'Probna stranica premještena u otpad.';
 	}
 
+	if ( binsider_write_htaccess() ) {
+		$log[] = '.htaccess: HTML se ne kešira u pregledaču.';
+	}
+
 	// Brand images in the media library → site icon + default share image.
 	$icon_id = binsider_import_brand_image( 'site-icon-512.png', 'Bošnjački Insajder — ikona' );
 	if ( $icon_id && ! get_option( 'site_icon' ) ) {

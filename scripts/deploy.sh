@@ -86,6 +86,9 @@ if [ "${1:-}" = "--starter" ]; then
   '
 fi
 
+echo "== Server rules (.htaccess block from binsider-core)"
+remote 'wp eval "echo binsider_write_htaccess() ? \"ok\" : \"FAILED\", PHP_EOL;"'
+
 echo "== Purge cache"
 remote 'wp litespeed-purge all 2>/dev/null || wp cache flush'
 

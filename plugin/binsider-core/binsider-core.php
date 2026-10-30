@@ -3,7 +3,7 @@
  * Plugin Name:       Bošnjački Insajder — Core
  * Plugin URI:        https://www.binsider.me
  * Description:       Funkcionalnost portala Bošnjački Insajder: rubrike, stranice, blokovi (udarne vijesti, najčitanije, dijeljenje, logo), Google News sitemap, NewsArticle schema i sigurnosna podešavanja. Potrebna za temu „Bošnjački Insajder".
- * Version:           1.2.0
+ * Version:           1.3.0
  * Requires at least: 6.6
  * Requires PHP:      8.1
  * Author:            Bošnjački Insajder
@@ -13,7 +13,7 @@
 
 defined( 'ABSPATH' ) || exit;
 
-define( 'BINSIDER_VERSION', '1.2.0' );
+define( 'BINSIDER_VERSION', '1.3.0' );
 define( 'BINSIDER_FILE', __FILE__ );
 define( 'BINSIDER_DIR', plugin_dir_path( __FILE__ ) );
 define( 'BINSIDER_URL', plugin_dir_url( __FILE__ ) );

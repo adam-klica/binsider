@@ -145,7 +145,19 @@ function binsider_chat_links(): array {
 		return array();
 	}
 	return array(
-		'viber'    => array( 'Viber', 'viber://chat?number=%2B' . $phone ),
+		// viber://contact works in the Viber phone apps; viber://chat gives "requested page is unavailable" on iOS
+		// (tested on espamplus.me, 28. 10. 2026). assets/viber.js switches to viber://chat for Viber Desktop.
+		'viber'    => array( 'Viber', 'viber://contact?number=%2B' . $phone ),
 		'whatsapp' => array( 'WhatsApp', 'https://wa.me/' . $phone ),
 	);
+}
+
+/**
+ * Data attributes for a viber:// link; enqueues assets/viber.js, which shows the number and a WhatsApp link
+ * when the Viber app doesn't open (desktop without Viber — the browser silently ignores viber://).
+ */
+function binsider_viber_attrs(): string {
+	$phone = preg_replace( '/\D+/', '', (string) binsider_option( 'chat_phone' ) );
+	wp_enqueue_script( 'binsider-viber' );
+	return sprintf( ' data-phone="%s" data-whatsapp="%s"', esc_attr( '+' . $phone ), esc_url( 'https://wa.me/' . $phone ) );
 }

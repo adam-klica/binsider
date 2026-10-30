@@ -88,6 +88,68 @@ add_filter(
 	}
 );
 
+// The homepage is a static page called "Naslovna", so Yoast titles it "Naslovna - Bošnjački Insajder" and leaves
+// og:description empty. Use the site name + tagline instead, unless an editor set a title on that page in Yoast.
+function binsider_front_page_has_own( string $meta_key ): bool {
+	return '' !== trim( (string) get_post_meta( (int) get_option( 'page_on_front' ), $meta_key, true ) );
+}
+
+add_filter(
+	'wpseo_title',
+	static function ( $title ) {
+		if ( is_front_page() && ! binsider_front_page_has_own( '_yoast_wpseo_title' ) ) {
+			return get_bloginfo( 'name' ) . ' – ' . get_bloginfo( 'description' );
+		}
+		return $title;
+	}
+);
+add_filter(
+	'wpseo_opengraph_title',
+	static function ( $title ) {
+		return is_front_page() && ! binsider_front_page_has_own( '_yoast_wpseo_opengraph-title' ) ? get_bloginfo( 'name' ) : $title;
+	}
+);
+foreach ( array( 'wpseo_opengraph_desc', 'wpseo_twitter_description' ) as $binsider_filter ) {
+	add_filter(
+		$binsider_filter,
+		static function ( $desc ) {
+			return is_front_page() && '' === trim( (string) $desc ) ? get_bloginfo( 'description' ) : $desc;
+		}
+	);
+}
+
+// Breadcrumbs (also in the BreadcrumbList schema): Yoast's untranslated "Home" → "Naslovna".
+add_filter(
+	'wpseo_breadcrumb_links',
+	static function ( $links ) {
+		if ( is_array( $links ) && isset( $links[0]['text'] ) && 'Home' === $links[0]['text'] ) {
+			$links[0]['text'] = 'Naslovna';
+		}
+		return $links;
+	}
+);
+
+// Yoast's "Written by / Est. reading time" twitter labels are untranslated ("2 minute"); drop them.
+add_filter( 'wpseo_enhanced_slack_data', '__return_empty_array' );
+
+// Organization schema: social profiles from Settings → Bošnjački Insajder (helps Google tie them to the site).
+add_filter(
+	'wpseo_schema_organization',
+	static function ( $data ) {
+		$profiles = array();
+		foreach ( array( 'facebook', 'instagram', 'youtube', 'x', 'tiktok', 'telegram' ) as $key ) {
+			$url = (string) binsider_option( $key );
+			if ( $url ) {
+				$profiles[] = $url;
+			}
+		}
+		if ( $profiles ) {
+			$data['sameAs'] = array_values( array_unique( array_merge( (array) ( $data['sameAs'] ?? array() ), $profiles ) ) );
+		}
+		return $data;
+	}
+);
+
 // Yoast: articles are news articles.
 add_filter(
 	'wpseo_schema_article_type',

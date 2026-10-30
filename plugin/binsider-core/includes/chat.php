@@ -23,7 +23,7 @@ add_action(
 				'<a class="bi-fab__btn bi-fab__btn--%1$s" href="%2$s" rel="noopener"%3$s aria-label="%4$s"><span class="bi-fab__tip">%5$s</span>%6$s</a>',
 				esc_attr( $key ),
 				esc_url( $href, array( 'https', 'viber' ) ),
-				'whatsapp' === $key ? ' target="_blank"' : '',
+				'whatsapp' === $key ? ' target="_blank"' : binsider_viber_attrs(),
 				esc_attr( "Pišite nam na {$label}" ),
 				esc_html( $label ),
 				binsider_icon( $key, 26 )
@@ -46,5 +46,6 @@ add_action(
 	'init',
 	static function () {
 		wp_register_script( 'binsider-fab', BINSIDER_URL . 'assets/fab.js', array(), BINSIDER_VERSION, array( 'in_footer' => true, 'strategy' => 'defer' ) );
+		wp_register_script( 'binsider-viber', BINSIDER_URL . 'assets/viber.js', array(), BINSIDER_VERSION, array( 'in_footer' => true, 'strategy' => 'defer' ) );
 	}
 );

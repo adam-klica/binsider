@@ -39,3 +39,18 @@ add_filter(
 	10,
 	2
 );
+
+/**
+ * Hostinger's default .htaccess sets `ExpiresDefault "access plus 1 weeks"`, which also covers HTML: browsers then
+ * keep a page (homepage included) for a week without asking again — wrong for a news site. HTML gets max-age=0,
+ * so browsers revalidate every time; LiteSpeed's server-side page cache still answers fast.
+ * Called by binsider_run_setup() and scripts/deploy.sh (idempotent: rewrites only our marked block).
+ */
+function binsider_write_htaccess(): bool {
+	require_once ABSPATH . 'wp-admin/includes/misc.php';
+	return insert_with_markers(
+		ABSPATH . '.htaccess',
+		'Binsider',
+		array( '<IfModule mod_expires.c>', 'ExpiresByType text/html A0', '</IfModule>' )
+	);
+}

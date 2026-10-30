@@ -162,7 +162,7 @@ function binsider_render_sections_nav( array $attrs ): string {
 function binsider_render_chat_links(): string {
 	$items = '';
 	foreach ( binsider_chat_links() as $key => [ $label, $href ] ) {
-		$items .= sprintf( '<a class="bi-chat bi-chat--%s" href="%s" rel="noopener">%s<span>%s</span></a>', esc_attr( $key ), esc_url( $href, array( 'https', 'viber' ) ), binsider_icon( $key, 20 ), esc_html( $label ) );
+		$items .= sprintf( '<a class="bi-chat bi-chat--%s" href="%s" rel="noopener"%s>%s<span>%s</span></a>', esc_attr( $key ), esc_url( $href, array( 'https', 'viber' ) ), 'viber' === $key ? binsider_viber_attrs() : '', binsider_icon( $key, 20 ), esc_html( $label ) );
 	}
 	return $items ? binsider_wrapper( 'bi-chat-links', $items ) : '';
 }
@@ -248,15 +248,25 @@ function binsider_render_section_title( array $attrs ): string {
 	return binsider_wrapper( 'bi-section-title', $inner );
 }
 
+function binsider_enqueue_cf7(): void {
+	wpcf7_enqueue_scripts();
+	wpcf7_enqueue_styles();
+}
+
 function binsider_render_form( array $attrs ): string {
 	$id = binsider_form_id( (string) ( $attrs['form'] ?? 'kontakt' ) );
 	if ( ! $id ) {
 		return current_user_can( 'manage_options' ) ? binsider_wrapper( 'bi-notice', 'Forma nije dostupna — aktivirajte dodatak „Contact Form 7".', 'p' ) : '';
 	}
-	// CF7's scripts and styles are off site-wide (see seo.php); load them only where a form is rendered.
+	// CF7's scripts and styles are off site-wide (see performance.php); load them only where a form is rendered.
+	// A block theme renders the template before wp_enqueue_scripts, when CF7 has not registered its script yet:
+	// enqueueing then would drop CF7's inline `var wpcf7` config and the form could not submit. Wait for it.
 	if ( function_exists( 'wpcf7_enqueue_scripts' ) ) {
-		wpcf7_enqueue_scripts();
-		wpcf7_enqueue_styles();
+		if ( did_action( 'wp_enqueue_scripts' ) ) {
+			binsider_enqueue_cf7();
+		} else {
+			add_action( 'wp_enqueue_scripts', 'binsider_enqueue_cf7', 20 );
+		}
 	}
 	return binsider_wrapper( 'bi-form', do_shortcode( sprintf( '[contact-form-7 id="%d"]', $id ) ) );
 }
